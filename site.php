@@ -3,6 +3,7 @@
 use \Estrutura\Page;
 use \Estrutura\Model\Product;
 use \Estrutura\Model\Category;
+use \Estrutura\Model\Cart;
 
 $app->get('/', function() {
 
@@ -59,6 +60,16 @@ $app->get("/products/:desurl",function($desurl){
 		'categories'=>$product->getCategories()
 	));
 
+
+});
+
+$app->get("/cart",function(){
+
+	$cart = Cart::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl("cart");
 
 });
 
