@@ -205,7 +205,7 @@ class User extends Model {
 
 	}
 
-	public static function getForgot($email){
+	public static function getForgot($email, $inadmin = true){
 
 		$sql = new Sql();
 
@@ -242,7 +242,16 @@ class User extends Model {
 
 				$code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
 
-				$link = "http://www.prjecommerce.com.br:81/admin/forgot/reset?code=$code";
+				if ($inadmin === true) {
+
+					$link = "http://www.prjecommerce.com.br:81/admin/forgot/reset?code=$code";
+
+				} else {
+
+					$link = "http://www.prjecommerce.com.br:81/forgot/reset?code=$code";
+
+				}
+				
 
 				$mailer = new Mailer($data["desemail"], $data["desperson"],"Redefinir senha do Usuario", "forgot", array(
 					"name"=>$data["desperson"],
@@ -342,6 +351,37 @@ class User extends Model {
 	{
 
 		$_SESSION[User::ERROR_REGISTER] = $msg;
+
+	}
+
+	public static function getErrorRegister()
+	{
+
+		$msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
+
+		User::clearErrorRegister();
+
+		return $msg;
+
+	}
+
+	public static function clearErrorRegister()
+	{
+
+		$_SESSION[User::ERROR_REGISTER] = NULL;
+
+	}
+
+	public static function checkLoginExist($login)
+	{
+
+		$sql = new Sql();
+
+		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin", array(
+			':deslogin'=>$login
+		));
+
+		return (count($results) > 0);
 
 	}
 
